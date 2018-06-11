@@ -1,0 +1,9 @@
+Package: chronotools
+Title: Visualize and Plot Chronograms with R and phytools
+Version: 0.0.0.9000
+Authors@R: person("Sergio", "Vargas", email = "sergio.vargas@lmu.de", role = c("aut","cre"))
+Description: The package chronotools is a hack of phytools that provides new functions and utilities to visualize chronograms in different ways and plot publication ready time trees.
+Depends: R (>= 3.4.1), phytools, plotrix
+License: GPL (>=2)
+Encoding: UTF-8
+LazyData: true

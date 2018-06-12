@@ -288,7 +288,9 @@ plotChronogram.postvsprior<-function(tree,age.range,prior.brackets,posterior.bra
   prior.color<-if(!is.null(args$prior.col)) prior.col else "red"
   posterior.color<-if(!is.null(args$posterior.col)) prior.col else "blue"
 
-  par(mar=c(0,0,0,0))
+  selected.nodes<-if(!is.null(args$selected.nodes)) args$selected.nodes else 1:tree$Nnode
+
+  par(mar=c(0,1,0,0))
 
   plot.new()
 
@@ -324,20 +326,23 @@ plotChronogram.postvsprior<-function(tree,age.range,prior.brackets,posterior.bra
     prior_densities<-prior.densities[[i-Ntip(tree)]]
     prior_ages<-prior.brackets[[i-Ntip(tree)]]
 
-    for(j in 1:(length(prior.brackets[[i-Ntip(tree)]])-1)){
-
-      rect(prior_ages[j], obj$yy[i], prior_ages[j+1], obj$yy[i]+(prior_densities[j]*-hist.scaler), border=make.transparent(prior.color, base.alpha), col=make.transparent(prior.color, prior_alphas[j]*base.alpha))
-
-    }
-
-
     posterior_alphas<-round((posterior.densities[[i-Ntip(tree)]]-min(posterior.densities[[i-Ntip(tree)]]))/(max(posterior.densities[[i-Ntip(tree)]])-min(posterior.densities[[i-Ntip(tree)]])),2)
     posterior_densities<-posterior.densities[[i-Ntip(tree)]]
     posterior_ages<-posterior.brackets[[i-Ntip(tree)]]
 
-    for(j in 1:(length(posterior.brackets[[i-Ntip(tree)]])-1)){
+    if(i %in% selected.nodes){
 
-      rect(posterior_ages[j], obj$yy[i], posterior_ages[j+1], obj$yy[i]+(posterior_densities[j]*hist.scaler), border=make.transparent(posterior.color, base.alpha), col=make.transparent(posterior.color, posterior_alphas[j]*base.alpha))
+      for(j in 1:(length(prior.brackets[[i-Ntip(tree)]])-1)){
+
+        rect(prior_ages[j], obj$yy[i], prior_ages[j+1], obj$yy[i]-(prior_densities[j]*hist.scaler), border=make.transparent(prior.color, base.alpha), col=make.transparent(prior.color, prior_alphas[j]*base.alpha))
+
+      }
+
+      for(j in 1:(length(posterior.brackets[[i-Ntip(tree)]])-1)){
+
+        rect(posterior_ages[j], obj$yy[i], posterior_ages[j+1], obj$yy[i]+(posterior_densities[j]*hist.scaler), border=make.transparent(posterior.color, base.alpha), col=make.transparent(posterior.color, posterior_alphas[j]*base.alpha))
+
+      }
 
     }
   }

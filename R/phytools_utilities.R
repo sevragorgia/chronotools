@@ -1,3 +1,155 @@
+
+#displacement = matrix with x,y displacement from node coordinates
+labelnodes<-function(text,node=NULL,...){
+
+  displacement<-if(hasArg(displacement)) list(...)$displacement else matrix(c(0,0,0,0),2,2)
+
+  if(hasArg(cex)) cex<-list(...)$cex
+  else cex<-1
+
+  obj<-get("last_plot.phylo",envir=.PlotPhyloEnv)
+
+  h<-cex*strheight("A")
+  w<-cex*strwidth(text)
+
+  if(is.null(node)){
+      cat("No node provided. Nothing to do...\n")
+  }else{
+    for(i in 1:length(text)){
+      ii<-node[i]
+      text(obj$xx[ii]-displacement[i,1],obj$yy[ii]+displacement[i,2],label=text[i],cex=cex)
+    }
+  }
+}
+
+# new params
+#
+# show.names
+#
+#
+geo.legend<-function(leg=NULL,colors=NULL,alpha=0.2,...){
+  if(hasArg(cex)) cex<-list(...)$cex
+  else cex<-par()$cex
+  if(hasArg(plot)) plot<-list(...)$plot
+  else plot<-TRUE
+  if(hasArg(show.lines)) show.lines<-list(...)$show.lines
+  else show.lines<-TRUE
+
+  if(hasArg(show.names)) show.names<-list(...)$show.names
+  else show.names<-TRUE
+  if(hasArg(show.dates)) show.dates<-list(...)$show.dates
+  else show.dates<-TRUE
+
+
+  obj<-get("last_plot.phylo",envir=.PlotPhyloEnv)
+  if(is.null(colors)){
+    colors<-setNames(c(
+      rgb(255,242,127,255,maxColorValue=255),
+      rgb(255,230,25,255,maxColorValue=255),
+      rgb(253,154,82,255,maxColorValue=255),
+      rgb(127,198,78,255,maxColorValue=255),
+      rgb(52,178,201,255,maxColorValue=255),
+      rgb(129,43,146,255,maxColorValue=255),
+      rgb(240,64,40,255,maxColorValue=255),
+      rgb(103,165,153,255,maxColorValue=255),
+      rgb(203,140,55,255,maxColorValue=255),
+      rgb(179,225,182,255,maxColorValue=255),
+      rgb(0,146,112,255,maxColorValue=255),
+      rgb(127,160,86,255,maxColorValue=255),
+      rgb(247,67,112,255,maxColorValue=255)),
+      c("Quaternary","Neogene","Paleogene",
+        "Cretaceous","Jurassic","Triassic",
+        "Permian","Carboniferous","Devonian",
+        "Silurian","Ordovician","Cambrian",
+        "Precambrian"))
+  }
+  if(is.null(leg)){
+    leg<-rbind(c(2.588,0),
+               c(23.03,2.588),
+               c(66.0,23.03),
+               c(145.0,66.0),
+               c(201.3,145.0),
+               c(252.17,201.3),
+               c(298.9,252.17),
+               c(358.9,298.9),
+               c(419.2,358.9),
+               c(443.8,419.2),
+               c(485.4,443.8),
+               c(541.0,485.4),
+               c(4600,541.0))
+    rownames(leg)<-c("Quaternary","Neogene","Paleogene",
+                     "Cretaceous","Jurassic","Triassic",
+                     "Permian","Carboniferous","Devonian",
+                     "Silurian","Ordovician","Cambrian",
+                     "Precambrian")
+    t.max<-max(obj$xx)
+    ii<-which(leg[,2]<=t.max)
+    leg<-leg[ii,]
+    leg[max(ii),1]<-t.max
+  }
+  colors<-sapply(colors,make.transparent,alpha=alpha)
+  if(plot){
+    y<-c(rep(0,2),rep(par()$usr[4],2))
+    ylabel<--1/25*obj$Ntip
+    for(i in 1:nrow(leg)){
+      strh<-strheight(rownames(leg)[i])
+      polygon(c(leg[i,1:2],leg[i,2:1]),y,
+              col=colors[rownames(leg)[i]],border=NA)
+      if(show.lines){
+        lines(x=rep(leg[i,1],2),y=c(0,par()$usr[4]),
+              lty="dotted",col="grey")
+        if(show.dates){
+          text(x=leg[i,1],y=-1,label=paste(leg[i,1]),col="black",cex=cex)
+        }
+      }
+      if(show.names){
+        polygon(x=c(leg[i,1],
+                  mean(leg[i,])-0.8*cex*get.asp()*strh,
+                  mean(leg[i,])-0.8*cex*get.asp()*strh,
+                  mean(leg[i,])+0.8*cex*get.asp()*strh,
+                  mean(leg[i,])+0.8*cex*get.asp()*strh,
+                  leg[i,2]),y=c(0,ylabel,par()$usr[3],
+                                par()$usr[3],ylabel,0),
+                  col=colors[rownames(leg)[i]],border=NA)
+        text(x=mean(leg[i,])+
+               if(obj$direction=="leftwards") 0.12*strh else -0.12*strh,
+               y=ylabel,labels=rownames(leg)[i],
+               srt=90,adj=c(1,0.5),cex=cex)
+        if(show.lines){
+          lines(x=c(leg[i,1],mean(leg[i,])-0.8*cex*
+                    get.asp()*strheight(rownames(leg)[i])),
+                    y=c(0,ylabel),lty="dotted",col="grey")
+          lines(x=c(leg[i,2],mean(leg[i,])+0.8*cex*
+                    get.asp()*strheight(rownames(leg)[i])),
+                    y=c(0,ylabel),lty="dotted",col="grey")
+          lines(x=rep(mean(leg[i,])-0.8*cex*
+                    get.asp()*strheight(rownames(leg)[i]),2),
+                    y=c(ylabel,par()$usr[3]),lty="dotted",col="grey")
+          lines(x=rep(mean(leg[i,])+0.8*cex*
+                    get.asp()*strheight(rownames(leg)[i]),2),
+                    y=c(ylabel,par()$usr[3]),lty="dotted",col="grey")
+        }
+      }
+
+    }
+  }
+  invisible(list(leg=leg,colors=colors))
+}
+
+
+##################################################################
+#
+#
+# Original code; forked 13.06.2018
+#
+#
+#
+#########################################################################################3
+
+
+
+
+
 ## some utility functions
 ## written by Liam J. Revell 2011, 2012, 2013, 2014, 2015, 2016, 2017
 
@@ -325,6 +477,13 @@ getSisters<-function(tree,node,mode=c("number","label")){
 
 ##required
 
+## borrowed from mapplots
+get.asp<-function(){
+  pin<-par("pin")
+  usr<-par("usr")
+  asp<-(pin[2]/(usr[4]-usr[3]))/(pin[1]/(usr[2]-usr[1]))
+  asp
+}
 
 # function reorders simmap tree
 # written Liam Revell 2011, 2013, 2015
@@ -372,7 +531,7 @@ getDescendants<-function(tree,node,curr=NULL){
 
 ## function to add a geological or other temporal legend to a plotted tree
 ## written by Liam J. Revell 2017
-geo.legend<-function(leg=NULL,colors=NULL,alpha=0.2,...){
+phytools.geo.legend<-function(leg=NULL,colors=NULL,alpha=0.2,...){
   if(hasArg(cex)) cex<-list(...)$cex
   else cex<-par()$cex
   if(hasArg(plot)) plot<-list(...)$plot
@@ -483,7 +642,7 @@ getnode<-function(...){
 
 ## function mostly to interactively label nodes by clicking
 ## written by Liam J. Revell 2017
-labelnodes<-function(text,node=NULL,interactive=TRUE,
+phytool_labelnodes<-function(text,node=NULL,interactive=TRUE,
                      shape=c("circle","ellipse","rect"),...){
   shape<-shape[1]
   if(hasArg(circle.exp)) circle.exp<-list(...)$circle.exp

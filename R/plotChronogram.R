@@ -19,6 +19,7 @@ plotChronogram.ageHistogram<-function(tree,age.range,age.brackets,alpha.vector,.
 
   args<-list(...)
 
+
   if(is.null(args$ftype)) args$ftype<-"i"
 
   fsize<-if(!is.null(args$fsize)) args$fsize else 1

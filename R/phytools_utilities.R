@@ -2,7 +2,7 @@
 #displacement = matrix with x,y displacement from node coordinates
 labelnodes<-function(text,node=NULL,...){
 
-  displacement<-if(hasArg(displacement)) list(...)$displacement else matrix(c(0,0,0,0),2,2)
+  displacement<-if(hasArg(displacement)) list(...)$displacement else matrix(rep(c(0,0),length(text)),length(text),2)
 
   if(hasArg(cex)) cex<-list(...)$cex
   else cex<-1
@@ -684,4 +684,57 @@ phytool_labelnodes<-function(text,node=NULL,interactive=TRUE,
     text(obj$xx[ii],obj$yy[ii],label=text[i],cex=cex)
   }
   invisible(node)
+}
+
+# function splits tree at split
+# written by Liam Revell 2011, 2014, 2015
+
+splitTree<-function(tree,split){
+  if(!inherits(tree,"phylo")) stop("tree should be an object of class \"phylo\".")
+  if(split$node>length(tree$tip.label)){
+    # first extract the clade given by shift$node
+    tr2<-extract.clade(tree,node=split$node)
+    tr2$root.edge<-tree$edge.length[which(tree$edge[,2]==split$node)]-split$bp
+    #now remove tips in tr2 from tree
+    tr1<-drop.clade(tree,tr2$tip.label)
+    nn<-if(!is.null(tree$node.label)) c(tree$node.label,"NA") else "NA"
+    tr1$tip.label[which(tr1$tip.label%in%nn)]<-"NA"
+    tr1$edge.length[match(which(tr1$tip.label=="NA"),tr1$edge[,2])]<-split$bp
+  } else {
+    # first extract the clade given by shift$node
+    tr2<-list(edge=matrix(c(2L,1L),1,2),tip.label=tree$tip.label[split$node],edge.length=tree$edge.length[which(tree$edge[,2]==split$node)]-split$bp,Nnode=1L)
+    class(tr2)<-"phylo"
+    # now remove tip in tr2 from tree
+    tr1<-tree
+    tr1$edge.length[match(which(tr1$tip.label==tr2$tip.label[1]),tr1$edge[,2])]<-split$bp
+    tr1$tip.label[which(tr1$tip.label==tr2$tip.label[1])]<-"NA"
+  }
+  trees<-list(tr1,tr2)
+  class(trees)<-"multiPhylo"
+  trees
+}
+
+# function drops entire clade
+# written by Liam Revell 2011, 2015
+
+drop.clade<-function(tree,tip){
+  if(!inherits(tree,"phylo")) stop("tree should be an object of class \"phylo\".")
+  nn<-if(!is.null(tree$node.label)) c(tree$node.label,"NA") else "NA"
+  tree<-drop.tip(tree,tip,trim.internal=FALSE)
+  while(sum(tree$tip.label%in%nn)>1)
+    tree<-drop.tip(tree,tree$tip.label[tree$tip.label%in%nn],
+                   trim.internal=FALSE)
+  tree
+}
+
+# function pastes subtree onto tip
+# written by Liam Revell 2011, 2015
+paste.tree<-function(tr1,tr2){
+  if(!inherits(tr1,"phylo")||!inherits(tr2,"phylo")) stop("tr1 & tr2 should be objects of class \"phylo\".")
+  if(length(tr2$tip)>1){
+    temp<-tr2$root.edge; tr2$root.edge<-NULL
+    tr1$edge.length[match(which(tr1$tip.label=="NA"),tr1$edge[,2])]<-tr1$edge.length[match(which(tr1$tip.label=="NA"),tr1$edge[,2])]+temp
+  }
+  tr.bound<-bind.tree(tr1,tr2,where=which(tr1$tip.label=="NA"))
+  return(tr.bound)
 }

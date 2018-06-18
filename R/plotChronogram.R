@@ -286,8 +286,8 @@ plotChronogram.postvsprior<-function(tree,age.range,prior.brackets,posterior.bra
     args$cex<-NULL
   } else cex<-1.2
 
-  prior.color<-if(!is.null(args$prior.col)) prior.col else "red"
-  posterior.color<-if(!is.null(args$posterior.col)) prior.col else "blue"
+  prior.color<-if(!is.null(args$prior.col)) args$prior.col else "red"
+  posterior.color<-if(!is.null(args$posterior.col)) args$posterior.col else "blue"
 
   selected.nodes<-if(!is.null(args$selected.nodes)) args$selected.nodes else 1:tree$Nnode
 

@@ -738,3 +738,24 @@ paste.tree<-function(tr1,tr2){
   tr.bound<-bind.tree(tr1,tr2,where=which(tr1$tip.label=="NA"))
   return(tr.bound)
 }
+
+# function rotates a node or multiple nodes
+# written by Liam J. Revell 2013, 2015
+rotateNodes<-function(tree,nodes,polytom=c(1,2),...){
+  if(!inherits(tree,"phylo")) stop("tree should be an object of class \"phylo\".")
+  n<-length(tree$tip.label)
+  if(nodes[1]=="all") nodes<-1:tree$Nnode+n
+  for(i in 1:length(nodes)) tree<-rotate(tree,nodes[i],polytom)
+  if(hasArg(reversible)) reversible<-list(...)$reversible
+  else reversible<-TRUE
+  if(reversible){
+    ii<-which(tree$edge[,2]<=n)
+    jj<-tree$edge[ii,2]
+    tree$edge[ii,2]<-1:n
+    tree$tip.label<-tree$tip.label[jj]
+  }
+  return(tree)
+}
+
+
+

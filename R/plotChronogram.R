@@ -291,6 +291,10 @@ plotChronogram.postvsprior<-function(tree,age.range,prior.brackets,posterior.bra
 
   selected.nodes<-if(!is.null(args$selected.nodes)) args$selected.nodes else 1:tree$Nnode
 
+  color<-if(!is.null(args$color)) args$color else rep("black", nrow(tree$edge))
+    #prepare brach colors
+  #from www.phytools.org/Cordoba2017/ex/15/Plotting_methods.html
+
   par(mar=c(0,1,0,0))
 
   plot.new()

@@ -460,7 +460,7 @@ phylotools_plotPhylogram<-function(tree,colors,fsize,ftype,lwd,pts,node.numbers,
 # written by Liam Revell 2012-2017
 plotTree<-function(tree,...){
 	if(hasArg(color)) color<-list(...)$color
-	else color<-NULL
+	else color<-rep("black", nrow(tree$edge))#sevra
 	if(hasArg(fsize)) fsize<-list(...)$fsize
 	else fsize<-1.0
 	if(hasArg(ftype)) ftype<-list(...)$ftype

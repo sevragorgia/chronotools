@@ -93,12 +93,12 @@ geo.legend<-function(leg=NULL,colors=NULL,alpha=0.2,...){
     ylabel<--1/25*obj$Ntip
     for(i in 1:nrow(leg)){
       strh<-strheight(rownames(leg)[i])
-      polygon(c(leg[i,1:2],leg[i,2:1]),y,
+      polygon(c(leg[i,1:2],leg[i,2:1]), y,
               col=colors[rownames(leg)[i]],border=NA)
       if(show.lines){
         lines(x=rep(leg[i,1],2),y=c(0,par()$usr[4]),
               lty="dotted",col="grey")
-        if(show.dates){
+        if(show.dates){#sevra
           text(x=leg[i,1],y=-1,label=paste(leg[i,1]),col="black",cex=cex)
         }
       }
@@ -130,7 +130,6 @@ geo.legend<-function(leg=NULL,colors=NULL,alpha=0.2,...){
                     y=c(ylabel,par()$usr[3]),lty="dotted",col="grey")
         }
       }
-
     }
   }
   invisible(list(leg=leg,colors=colors))
